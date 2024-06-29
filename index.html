@@ -62,7 +62,11 @@
         name: "",
         email: "",
         experienceLevel: "",
-        productFeatures: {},
+        productFeatures: {
+          feature1: "",
+          feature2: "",
+          feature3: ""
+        },
         comments: "",
       });
 
@@ -84,7 +88,11 @@
         setFormData((prevFormData) => ({
           ...prevFormData,
           experienceLevel,
-          productFeatures: {}, // Reset product features on experience level change
+          productFeatures: {
+            ...prevFormData.productFeatures,
+            // Reset product features on experience level change
+            ...(experienceLevel === "beginner" ? { feature2: "", feature3: "" } : {}),
+          },
         }));
       };
 
@@ -179,7 +187,7 @@
                     Feature 1:
                     <input
                       type="text"
-                      value={formData.productFeatures.feature1 || ""}
+                      value={formData.productFeatures.feature1}
                       onChange={(e) => handleProductFeatureChange("feature1", e.target.value)}
                     />
                   </label>
@@ -190,7 +198,7 @@
                         Feature 2:
                         <input
                           type="text"
-                          value={formData.productFeatures.feature2 || ""}
+                          value={formData.productFeatures.feature2}
                           onChange={(e) => handleProductFeatureChange("feature2", e.target.value)}
                         />
                       </label>
@@ -203,7 +211,7 @@
                         Feature 3:
                         <input
                           type="text"
-                          value={formData.productFeatures.feature3 || ""}
+                          value={formData.productFeatures.feature3}
                           onChange={(e) => handleProductFeatureChange("feature3", e.target.value)}
                         />
                       </label>
@@ -214,6 +222,7 @@
                     Comments:
                     <textarea
                       value={formData.comments}
+                      name="comments"
                       onChange={handleInputChange}
                     ></textarea>
                   </label>
@@ -281,17 +290,9 @@
       );
     };
 
-        const App =()=>{
-      return (
-        <>
-         <FeedbackForm />
-        </>
-      )
-    }
-
     // Render the FeedbackForm component into the root div
-    const rootElement = ReactDOM.createRoot(document.getElementById("root"));
-    ReactDOM.render(<App />);
+    const rootElement = document.getElementById("root");
+    ReactDOM.render(<FeedbackForm />, rootElement);
   </script>
 </body>
 </html>
