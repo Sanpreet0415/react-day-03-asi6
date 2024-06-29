@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Step Feedback Form</title>
+  <style>
+    /* Add your CSS styles for form elements and layout here */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-step {
+      display: none; /* Initially hide all steps */
+    }
+    .form-step.active {
+      display: block; /* Show active step */
+    }
+    .form-navigation {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .form-navigation button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .form-navigation button.primary {
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+    .form-navigation button.secondary {
+      background-color: #ccc;
+      color: black;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    // React component for the multi-step feedback form
+    const FeedbackForm = () => {
+      // State to manage form data across steps
+      const [formData, setFormData] = React.useState({
+        name: "",
+        email: "",
+        experienceLevel: "",
+        productFeatures: {},
+        comments: "",
+      });
+
+      // State to manage current step of the form
+      const [currentStep, setCurrentStep] = React.useState(1);
+
+      // Function to handle input changes in the form
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          [name]: value,
+        }));
+      };
+
+      // Function to handle selection of experience level
+      const handleExperienceLevelChange = (e) => {
+        const experienceLevel = e.target.value;
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          experienceLevel,
+          productFeatures: {}, // Reset product features on experience level change
+        }));
+      };
+
+      // Function to handle selection of product features
+      const handleProductFeatureChange = (featureId, value) => {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          productFeatures: {
+            ...prevFormData.productFeatures,
+            [featureId]: value,
+          },
+        }));
+      };
+
+      // Function to handle submission of the form
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log("Submitted Form Data:", formData);
+        // Send formData to server for further processing
+      };
+
+      // Function to navigate to the next step
+      const nextStep = () => {
+        setCurrentStep((prevStep) => prevStep + 1);
+      };
+
+      // Function to navigate to the previous step
+      const prevStep = () => {
+        setCurrentStep((prevStep) => prevStep - 1);
+      };
+
+      return (
+        <div className="form-container">
+          <form onSubmit={handleSubmit}>
+            {/* Step 1: General Information */}
+            <div className={`form-step ${currentStep === 1 ? "active" : ""}`}>
+              <h2>Step 1: General Information</h2>
+              <label>
+                Name:
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <br />
+              <label>
+                Email:
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <br />
+              <label>
+                Experience Level:
+                <select
+                  name="experienceLevel"
+                  value={formData.experienceLevel}
+                  onChange={handleExperienceLevelChange}
+                  required
+                >
+                  <option value="">Select...</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="expert">Expert</option>
+                </select>
+              </label>
+              <br />
+              <button
+                type="button"
+                className="primary"
+                onClick={nextStep}
+                disabled={!formData.name || !formData.email || !formData.experienceLevel}
+              >
+                Next
+              </button>
+            </div>
+
+            {/* Step 2: Product Feedback */}
+            <div className={`form-step ${currentStep === 2 ? "active" : ""}`}>
+              <h2>Step 2: Product Feedback</h2>
+              {formData.experienceLevel && (
+                <>
+                  <h3>Feedback on Product Features:</h3>
+                  <label>
+                    Feature 1:
+                    <input
+                      type="text"
+                      value={formData.productFeatures.feature1 || ""}
+                      onChange={(e) => handleProductFeatureChange("feature1", e.target.value)}
+                    />
+                  </label>
+                  <br />
+                  {formData.experienceLevel !== "beginner" && (
+                    <>
+                      <label>
+                        Feature 2:
+                        <input
+                          type="text"
+                          value={formData.productFeatures.feature2 || ""}
+                          onChange={(e) => handleProductFeatureChange("feature2", e.target.value)}
+                        />
+                      </label>
+                      <br />
+                    </>
+                  )}
+                  {formData.experienceLevel === "expert" && (
+                    <>
+                      <label>
+                        Feature 3:
+                        <input
+                          type="text"
+                          value={formData.productFeatures.feature3 || ""}
+                          onChange={(e) => handleProductFeatureChange("feature3", e.target.value)}
+                        />
+                      </label>
+                      <br />
+                    </>
+                  )}
+                  <label>
+                    Comments:
+                    <textarea
+                      value={formData.comments}
+                      onChange={handleInputChange}
+                    ></textarea>
+                  </label>
+                </>
+              )}
+              <br />
+              <button
+                type="button"
+                className="secondary"
+                onClick={prevStep}
+              >
+                Previous
+              </button>
+              <button
+                type="submit"
+                className="primary"
+                disabled={!gewrformData.productFeatures.feature1}
+              >
+                Submit Feedback
+              </button>
+            </div>
+
+            {/* Step 3: Confirmation */}
+            <div className={`form-step ${currentStep === 3 ? "active" : ""}`}>
+              <h2>Thank You!</h2>
+              <p>Review your feedback:</p>
+              <p><strong>Name:</strong> {formData.name}</p>
+              <p><strong>Email:</strong> {formData.email}</p>
+              <p><strong>Experience Level:</strong> {formData.experienceLevel}</p>
+              <p><strong>Feedback on Product Features:</strong></p>
+              <ul>
+                {Object.keys(formData.productFeatures).map((featureId, index) => (
+                  <li key={index}><strong>{featureId}:</strong> {formData.productFeatures[featureId]}</li>
+                ))}
+              </ul>
+              <p><strong>Comments:</strong> {formData.comments}</p>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setCurrentStep(1)}
+              >
+                Edit Feedback
+              </button>
+            </div>
+          </form>
+
+          {/* Form Navigation */}
+          <div className="form-navigation">
+            {currentStep !== 1 && (
+              <button className="secondary" onClick={prevStep}>
+                Previous
+              </button>
+            )}
+            {currentStep !== 3 ? (
+              <button className="primary" onClick={nextStep} disabled={!formData.productFeatures.feature1}>
+                Next
+              </button>
+            ) : (
+              <button className="disabled" disabled>
+                Next
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // Render the FeedbackForm component into the root div
+    const rootElement = document.getElementById("root");
+    ReactDOM.render(<FeedbackForm />, rootElement);
+  </script>
+</body>
+</html>
