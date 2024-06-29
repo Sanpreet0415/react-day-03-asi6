@@ -281,9 +281,17 @@
       );
     };
 
+        const App =()=>{
+      return (
+        <>
+         <FeedbackForm />
+        </>
+      )
+    }
+
     // Render the FeedbackForm component into the root div
-    const rootElement = document.getElementById("root");
-    ReactDOM.render(<FeedbackForm />, rootElement);
+    const rootElement = ReactDOM.createRoot(document.getElementById("root"));
+    ReactDOM.render(<App />);
   </script>
 </body>
 </html>
